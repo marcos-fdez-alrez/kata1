@@ -20,17 +20,18 @@ public class Kata1Application {
     private static final String ROMAN_PATH = "/roman";
     private static final String NORDIC_PATH = "/nordic";
 
-    public Stream<String> retrieveAllApisInfo(String endpoint, String... paths) {
+    public Stream<String> retrieveAllApisInfo(List<String> paths) {
         // TODO: pending
         return null;
     }
 
-    public Stream<String> filterByLetter(Stream<String> input, Predicate predicate) {
+    public Stream<String> filterByLetter(Stream<String> input, String letter) {
         // TODO: pending
+        // Predicate predicate
         return null;
     }
 
-    public IntStream convertToDigits(Stream<String> input) {
+    public Stream<String>  convertToDigits(Stream<String> input) {
         // TODO: pending
         return null;
     }

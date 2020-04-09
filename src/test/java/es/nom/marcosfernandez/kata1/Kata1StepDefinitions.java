@@ -24,10 +24,13 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -35,6 +38,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 
 public class Kata1StepDefinitions {
 
@@ -42,8 +46,15 @@ public class Kata1StepDefinitions {
     private static final String ROMAN_PATH = "/roman";
     private static final String NORDIC_PATH = "/nordic";
     private static final WireMockServer wireMockServer = new WireMockServer(options().dynamicPort());
+    private static final List<String> selectedNames = Arrays.asList("078101109101115105115",
+            "078101112116117110",
+            "078105107101",
+            "078106111114100");
 
     private List<String> apiRest = null;
+    private Kata1Application kata1Application = null;
+    private Stream<String> result = null;
+    private IntStream intStream = null;
 
     @Before(order = 1)
     public void initialization() {
@@ -54,6 +65,7 @@ public class Kata1StepDefinitions {
         configureGetStubFor(ROMAN_PATH, "json/romanGods.json", null);
         configureGetStubFor(NORDIC_PATH, "json/nordicGods.json", null);
 
+        kata1Application = new Kata1Application();
     }
 
     @Before(order = 2, value = "@happy")
@@ -83,28 +95,31 @@ public class Kata1StepDefinitions {
 
     @When("call and retrieve all API info")
     public void whenCallAndRetrieveAllInfo() {
-        throw new PendingException();
+        result = kata1Application.retrieveAllApisInfo(apiRest);
     }
 
     @When("call and retrieve all API info from the god list")
     public void call_and_retrieve_all_API_info_from_the_god_list() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+        result = kata1Application.retrieveAllApisInfo(apiRest);
     }
 
-    @Then("filter by god starting with `n`")
-    public void filterGodByStartingLetter() {
-        throw new PendingException();
+    @Then("filter by god starting with {string}")
+    public void filterGodByStartingLetter(String letter) {
+        result = kata1Application.filterByLetter(result, letter);
+        result = result.sorted();
+        assertLinesMatch(Arrays.asList("Nemesis","Neptun","Nike","Njord"),result.collect(Collectors.toList()));
     }
 
     @And("convert the names into a decimal format")
     public void convertNamesIntoDecimalFormat() {
-        throw new PendingException();
+        result = kata1Application.convertToDigits(result);
+        assertLinesMatch(selectedNames,result.collect(Collectors.toList()));
     }
 
     @And("sum")
     public void sum() {
-        throw new PendingException();
+        assertEquals(selectedNames.stream().mapToDouble(name -> Double.parseDouble(name)).sum(),
+                result.collect(Collectors.toList()).stream().mapToDouble(name -> Double.parseDouble(name)).sum());
     }
 
     @AfterStep
@@ -130,5 +145,6 @@ public class Kata1StepDefinitions {
 
         return stubMapping;
     }
+
 
 }
