@@ -53,8 +53,7 @@ public class Kata1StepDefinitions {
 
     private List<String> apiRest = null;
     private Kata1Application kata1Application = null;
-    private Stream<String> result = null;
-    private IntStream intStream = null;
+    private List<String> result = null;
 
     @Before(order = 1)
     public void initialization() {
@@ -106,20 +105,20 @@ public class Kata1StepDefinitions {
     @Then("filter by god starting with {string}")
     public void filterGodByStartingLetter(String letter) {
         result = kata1Application.filterByLetter(result, letter);
-        result = result.sorted();
-        assertLinesMatch(Arrays.asList("Nemesis","Neptun","Nike","Njord"),result.collect(Collectors.toList()));
+        result = result.stream().sorted().collect(Collectors.toList());
+        assertLinesMatch(Arrays.asList("Nemesis","Neptun","Nike","Njord"),result);
     }
 
     @And("convert the names into a decimal format")
     public void convertNamesIntoDecimalFormat() {
         result = kata1Application.convertToDigits(result);
-        assertLinesMatch(selectedNames,result.collect(Collectors.toList()));
+        assertLinesMatch(selectedNames,result);
     }
 
     @And("sum")
     public void sum() {
         assertEquals(selectedNames.stream().mapToDouble(name -> Double.parseDouble(name)).sum(),
-                result.collect(Collectors.toList()).stream().mapToDouble(name -> Double.parseDouble(name)).sum());
+                kata1Application.sum(result));
     }
 
     @AfterStep
