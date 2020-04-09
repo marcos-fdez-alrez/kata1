@@ -35,8 +35,14 @@ public class Kata1Application {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
         // TODO: review stream -> list -> stream ...
+
         Stream<List<String>> listado = paths.stream().map(path -> CompletableFuture.supplyAsync(() -> obtainApiInfo(path))).map(CompletableFuture::join);
+
+        /* 10 s 315ms - cleaner code with worse performance ? */
         List<String> result = listado.flatMap(List::stream).collect(Collectors.toList());
+
+        /* 7s - 540ms
+        List<String> result = listado.collect(Collectors.toList()).stream().flatMap(List::stream).collect(Collectors.toList());*/
 
          /*previous solution - 8s 161ms
         result = paths.stream().flatMap(path -> obtainApiInfo(path).stream()).collect(Collectors.toList());*/
