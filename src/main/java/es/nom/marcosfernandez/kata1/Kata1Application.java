@@ -3,25 +3,16 @@ package es.nom.marcosfernandez.kata1;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -39,21 +30,23 @@ public class Kata1Application {
     private IntStream intStream = null;
 
     public List<String> retrieveAllApisInfo(List<String> paths) {
+
+        /* 7s 586ms*/
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-        /*CompletableFuture.supplyAsync(() -> obtainApiInfo(paths.get(0)), executorService)
-                .thenCombine(CompletableFuture.supplyAsync(() -> obtainApiInfo(paths.get(1)))
-                        .thenCombine(CompletableFuture.supplyAsync(() -> obtainApiInfo(paths.get(2))),
-                        this::convert)
-                .completeOnTimeout(Arrays.asList(""), 10, TimeUnit.SECONDS)*/
+        // TODO: review stream -> list -> stream ...
+        Stream<List<String>> listado = paths.stream().map(path -> CompletableFuture.supplyAsync(() -> obtainApiInfo(path))).map(CompletableFuture::join);
+        List<String> result = listado.collect(Collectors.toList()).stream().flatMap(List::stream)
+                .collect(Collectors.toList());
 
-        //paths.stream().map(path -> CompletableFuture.supplyAsync(() -> obtainApiInfo(path))).map(CompletableFuture::join);
+         /*previous solution - 8s 161ms
+        result = paths.stream().flatMap(path -> obtainApiInfo(path).stream()).collect(Collectors.toList());*/
 
-        result = paths.stream().flatMap(path -> obtainApiInfo(path).stream()).collect(Collectors.toList());
         return result;
     }
 
     private List<String> obtainApiInfo(String uri)  {
+        // TODO: ugly code
         try {
             HttpGet request = new HttpGet(uri);
             request.addHeader("accept", APPLICATION_JSON);
