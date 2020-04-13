@@ -19,12 +19,24 @@ And  sum
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
+/*import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;*/
+
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+// TODO: CUCUMBER + JUNIT 5
 import io.cucumber.java.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +50,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.junit.jupiter.api.Assertions.assertLinesMatch;
+
 
 public class Kata1StepDefinitions {
 
@@ -79,11 +91,11 @@ public class Kata1StepDefinitions {
         configureGetStubFor(GREEK_PATH, "json/greekGods.json",5000);
     }
 
-    @BeforeStep
+    /*@BeforeStep
     public void beforeStep() {
         // BeforeStep
 
-    }
+    }*/
 
     @Given("a list of REST API about Greek, Roman & Nordic")
     public void givenAPIRestList() {
@@ -102,6 +114,7 @@ public class Kata1StepDefinitions {
         result = kata1Application.retrieveAllApisInfo(apiRest);
     }
 
+    //@Then("filter by god starting with (.+)")
     @Then("filter by god starting with {string}")
     public void filterGodByStartingLetter(String letter) {
         result = kata1Application.filterByLetter(result, letter);
@@ -117,14 +130,14 @@ public class Kata1StepDefinitions {
 
     @And("sum")
     public void sum() {
-        assertEquals(selectedNames.stream().mapToDouble(name -> Double.parseDouble(name)).sum(),
-                kata1Application.sum(result));
+        assertEquals((Double) selectedNames.stream().mapToDouble(name -> Double.parseDouble(name)).sum(),kata1Application.sum(result));
+        /*assertEquals(,                );*/
     }
 
-    @AfterStep
+    /* @AfterStep
     public void afterStep() {
         // after step
-    }
+    }*/
 
     @After
     public void afterScenario() {
